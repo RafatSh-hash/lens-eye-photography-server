@@ -19,6 +19,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const serviceCollection = client.db("lephoto").collection("services");
+    const reviewCollection = client.db("lephoto").collection("reviews");
 
     app.get("/services", async (req, res) => {
       const query = {};
@@ -49,7 +50,35 @@ async function run() {
       res.send(service);
     });
 
-    
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
+
+    app.post("/usersReview", async (req, res) => {
+      const usersReview = req.body;
+      // console.log(usersReview);
+      const result = await reviewCollection.insertOne(usersReview);
+      res.send(result);
+    });
+
+    app.get("reviews", async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      console.log(reviews);
+      res.send(reviews);
+    });
+  } finally {
+  }
+}
+run().catch((e) => console.log(e));
 
 app.get("/", (req, res) => {
   res.send("Server running Successfully");
