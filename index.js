@@ -128,7 +128,6 @@ run().catch((e) => console.log(e));
 app.get("/", (req, res) => {
   res.send("Server running Successfully");
 });
-
 app.listen(port, () => {
   console.log(`Listening to ${port}`);
 });
