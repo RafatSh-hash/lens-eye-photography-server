@@ -43,7 +43,6 @@ async function run() {
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "7d",
       });
-
       res.send({ token });
     });
 
@@ -65,7 +64,6 @@ async function run() {
       const query = {};
       const cursor = serviceCollection.find(query).limit(0);
       const allservices = await cursor.toArray();
-      // console.log(allservices);
       res.send(allservices);
     });
 
@@ -84,7 +82,6 @@ async function run() {
 
     app.post("/usersreview", async (req, res) => {
       const usersReview = req.body;
-      // console.log(usersReview);
       const result = await reviewCollection.insertOne(usersReview);
       res.send(result);
     });
@@ -92,13 +89,11 @@ async function run() {
     app.get("/reviews", async (req, res) => {
       let query = {};
       if (req.query.email) {
-        // console.log(req.query.email);
         query = {
           email: req.query.email,
         };
       }
       const cursor = reviewCollection.find(query);
-
       const reviews = await cursor.toArray();
 
       res.send(reviews);
@@ -112,28 +107,19 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/reviews/:id", (req, res) => {
-    //   const id = req.reviews.serviceID;
-    //   const reviewCollection = client
-    //     .db("lephoto")
-    //     .collection("reviews")
-    //     .find({ serviceID: id })
-    //     .toArray(function (err, result) {
-    //       if (err) throw err;
-    //       res.send(result);
-    //     });
-
-    // const id = req.params.id;
-    // const query = { serviceName: "Wedding Photography" };
-    // const reviews = await reviewCollection.findOne(query);
-    // res.send(reviewCollection);
-    //     let query = {};
-    // res.send(query);
-    // const cursor = reviewCollection.find(query);
-    // const reviews = await cursor.toArray();
-    // console.log(reviews[0], "-------------------");
-    //   // res.send(reviews);
-    // });
+    app.get("/review/:id", (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const reviewCollection = client
+        .db("lephoto")
+        .collection("reviews")
+        .find({ service: id })
+        .toArray(function (err, result) {
+          if (err) throw err;
+          console.log(result);
+          res.send(result);
+        });
+    });
   } finally {
   }
 }
