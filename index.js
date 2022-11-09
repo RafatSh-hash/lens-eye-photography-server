@@ -118,22 +118,54 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewCollection.deleteOne(query);
-      console.log(result);
+      // console.log(result);
       res.send(result);
     });
     //Getting Specific Reviews
     app.get("/review/:id", (req, res) => {
       const id = req.params.id;
-      console.log(id);
+      // console.log(id);
       const reviewCollection = client
         .db("lephoto")
         .collection("reviews")
         .find({ service: id })
         .toArray(function (err, result) {
           if (err) throw err;
-          console.log(result);
+          // console.log(result);
           res.send(result);
         });
+    });
+
+    //send Data for Update
+    app.get("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.findOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
+    //Recieving and Posting updated Data
+    app.put("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: ObjectId(id) };
+      const reviewInfo = req.body;
+
+      const option = { upsert: true };
+      const updatedReview = {
+        $set: {
+          review: reviewInfo.review,
+        },
+      };
+      const result = await reviewCollection.updateOne(
+        filter,
+        updatedReview,
+        option
+      );
+      console.log(result);
+      res.send(result);
     });
   } finally {
   }
