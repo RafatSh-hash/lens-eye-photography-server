@@ -38,6 +38,15 @@ async function run() {
     const serviceCollection = client.db("lephoto").collection("services");
     const reviewCollection = client.db("lephoto").collection("reviews");
 
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "7d",
+      });
+
+      res.send({ token });
+    });
+
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query).limit(3);
