@@ -20,13 +20,13 @@ const client = new MongoClient(uri, {
 function verifyJWT(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    return res.send({ message: "Unauthorized Access" });
+    return res.status(401).send({ message: "Unauthorized Access" });
   }
   const token = authHeader.split(" ")[1];
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (error, decoded) {
     if (error) {
-      return res.send({ message: "Forbidden" });
+      return res.status(403).send({ message: "Forbidden" });
     }
     req.decoded = decoded;
     next();
@@ -74,19 +74,19 @@ async function run() {
       res.send(service);
     });
 
-    app.post("/services", async (req, res) => {
+    app.post("/services", verifyJWT, async (req, res) => {
       const service = req.body;
       const result = await serviceCollection.insertOne(service);
       res.send(result);
     });
 
-    app.post("/usersreview", async (req, res) => {
+    app.post("/usersreview", verifyJWT, async (req, res) => {
       const usersReview = req.body;
       const result = await reviewCollection.insertOne(usersReview);
       res.send(result);
     });
 
-    app.get("/reviews", async (req, res) => {
+    app.get("/reviews", verifyJWT, async (req, res) => {
       let query = {};
       if (req.query.email) {
         query = {
@@ -99,7 +99,7 @@ async function run() {
       res.send(reviews);
     });
 
-    app.delete("/reviews/:id", async (req, res) => {
+    app.delete("/reviews/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewCollection.deleteOne(query);
